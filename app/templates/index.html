@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>QualiTrust Global - Qualification Verification</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; color: #222; }
+    h1 { color: #123456; }
+    input, button { padding: 8px; margin: 4px 0; width: 100%; box-sizing: border-box; }
+    button { background: #123456; color: white; border: none; cursor: pointer; }
+    #result { margin-top: 20px; padding: 12px; border-radius: 6px; }
+    .verified { background: #d4edda; }
+    .revoked, .not_found { background: #f8d7da; }
+  </style>
+</head>
+<body>
+  <h1>QualiTrust Global</h1>
+  <p>AI-enabled qualification verification platform (demo UI)</p>
+  <h3>Verify a Certificate</h3>
+  <input id="certInput" placeholder="e.g. UZ-2023-000451">
+  <button onclick="verify()">Verify</button>
+  <div id="result"></div>
+
+  <script>
+    async function verify() {
+      const cert = document.getElementById('certInput').value;
+      const res = await fetch('/api/verify/' + encodeURIComponent(cert));
+      const data = await res.json();
+      const div = document.getElementById('result');
+      div.className = data.result ? data.result.toLowerCase() : '';
+      div.innerText = data.message;
+    }
+  </script>
+</body>
+</html>
