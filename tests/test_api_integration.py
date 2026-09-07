@@ -3,9 +3,6 @@ Integration tests: exercise the Flask routes end-to-end against a real
 (temporary) SQLite database. This is the 'Integration tests' evidence
 required by the assignment's QA section.
 """
-import json
-
-
 SAMPLE = {
     "holder_name": "Chipo Ncube",
     "qualification_title": "MSc Computer Science",

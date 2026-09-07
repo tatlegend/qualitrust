@@ -1,0 +1,73 @@
+name: QualiTrust CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop, "feature/**" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    name: Build, Lint, Test, Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # --- Automated build process ---
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # --- Static code analysis / coding standards compliance (quality gate) ---
+      - name: Run flake8 static analysis
+        run: flake8 app/ tests/ --max-line-length=100 --statistics
+
+      # --- Automated testing: unit + integration, with coverage reporting ---
+      - name: Run unit and integration tests with coverage
+        run: |
+          PYTHONPATH=. pytest tests/ -v \
+            --cov=app --cov-report=term-missing --cov-report=xml \
+            --cov-fail-under=80
+
+      # --- Quality gate: fail the pipeline if coverage drops below threshold ---
+      - name: Enforce coverage quality gate
+        run: echo "Coverage gate passed (minimum 80% enforced by --cov-fail-under)."
+
+      - name: Upload coverage report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+
+  docker-build:
+    name: Build & Push Docker Image (Continuous Delivery)
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t qualitrust:${{ github.sha }} .
+
+      - name: Smoke-test the container
+        run: |
+          docker run -d -p 5000:5000 --name qualitrust-smoke qualitrust:${{ github.sha }}
+          sleep 3
+          curl --fail http://localhost:5000/ || (docker logs qualitrust-smoke && exit 1)
+          docker stop qualitrust-smoke
+
+      # In a real deployment, this step pushes to a registry (Docker Hub/ECR/GCR)
+      # and then triggers a deploy to the target environment.
+      - name: Deliver (placeholder for push to registry / cloud deploy)
+        run: echo "Image qualitrust:${{ github.sha }} is ready for delivery to staging/production."
