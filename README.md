@@ -5,19 +5,21 @@ qualification verification system built with Flask + SQLite, tested with pytest,
 linted with flake8, containerised with Docker, and wired into a GitHub Actions
 CI/CD pipeline.
 
-## Features
-- Register a qualification/certification
-- Search qualification records
-- Verify the authenticity of a qualification by certificate number
-- Revoke a qualification
-- Auditable history of every action (audit_log table)
+## The four core capabilities
+1. **Register** — `POST /api/qualifications`
+2. **Search** — `GET /api/qualifications?q=<term>` (fuzzy match)
+3. **Retrieve** — `GET /api/qualifications/<certificate_number>` (exact match, full record)
+4. **Verify** — `GET /api/verify/<certificate_number>` (VERIFIED / REVOKED / NOT_FOUND)
 
-## Quick start
+Every one of the above writes an entry to `audit_log`, giving a full auditable
+trail of verification activity, viewable via `GET /api/audit-log`.
+
+## Quick start (macOS)
 ```bash
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
-PYTHONPATH=. python wsgi.py
+PYTHONPATH=. python3 wsgi.py
 ```
 Then open http://127.0.0.1:5000
 
@@ -25,14 +27,14 @@ Then open http://127.0.0.1:5000
 ```bash
 PYTHONPATH=. pytest tests/ -v --cov=app --cov-report=term-missing
 ```
-19 tests, 98% coverage as of the last run.
+23 tests, 97% coverage as of the last run.
 
 ## Linting
 ```bash
 flake8 app/ tests/ --max-line-length=100
 ```
 
-## Docker
+## Docker (macOS — Apple Silicon and Intel both supported)
 ```bash
 docker build -t qualitrust:latest .
 docker run -d -p 5000:5000 qualitrust:latest
