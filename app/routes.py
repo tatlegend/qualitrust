@@ -63,6 +63,27 @@ def search_qualifications():
     return jsonify([dict(r) for r in rows])
 
 
+@bp.route("/api/qualifications/<certificate_number>", methods=["GET"])
+def retrieve_qualification(certificate_number):
+    """
+    Retrieve a single qualification record by its exact certificate number.
+    Distinct from /api/verify: this returns the full record (for an
+    authorised back-office user), whereas /verify returns only the
+    authenticity result (safe to expose to an external checker).
+    """
+    db = get_db()
+    record = db.execute(
+        "SELECT * FROM qualification WHERE certificate_number = ?",
+        (certificate_number,),
+    ).fetchone()
+
+    if record is None:
+        return jsonify({"error": "No qualification found with that certificate number."}), 404
+
+    log_action("RETRIEVE", certificate_number, request.remote_addr or "system")
+    return jsonify(dict(record))
+
+
 @bp.route("/api/verify/<certificate_number>", methods=["GET"])
 def verify_qualification(certificate_number):
     db = get_db()
@@ -93,6 +114,13 @@ def revoke_qualification(certificate_number):
 
 @bp.route("/api/audit-log", methods=["GET"])
 def audit_log():
+    cert_filter = request.args.get("certificate_number")
     db = get_db()
-    rows = db.execute("SELECT * FROM audit_log ORDER BY timestamp DESC").fetchall()
+    if cert_filter:
+        rows = db.execute(
+            "SELECT * FROM audit_log WHERE certificate_number = ? ORDER BY timestamp DESC",
+            (cert_filter,),
+        ).fetchall()
+    else:
+        rows = db.execute("SELECT * FROM audit_log ORDER BY timestamp DESC").fetchall()
     return jsonify([dict(r) for r in rows])

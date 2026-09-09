@@ -8,20 +8,78 @@
     h1 { color: #123456; }
     input, button { padding: 8px; margin: 4px 0; width: 100%; box-sizing: border-box; }
     button { background: #123456; color: white; border: none; cursor: pointer; }
-    #result { margin-top: 20px; padding: 12px; border-radius: 6px; }
-    .verified { background: #d4edda; }
-    .revoked, .not_found { background: #f8d7da; }
+    .panel { border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+    #result, #retrieveResult, #searchResult, #regResult { margin-top: 14px; padding: 12px; border-radius: 6px; background: #f4f4f4; white-space: pre-wrap; font-family: monospace; font-size: 13px; }
+    .verified { background: #d4edda !important; font-family: Arial, sans-serif !important; }
+    .revoked, .not_found { background: #f8d7da !important; font-family: Arial, sans-serif !important; }
   </style>
 </head>
 <body>
   <h1>QualiTrust Global</h1>
   <p>AI-enabled qualification verification platform (demo UI)</p>
-  <h3>Verify a Certificate</h3>
-  <input id="certInput" placeholder="e.g. UZ-2023-000451">
-  <button onclick="verify()">Verify</button>
-  <div id="result"></div>
+
+  <div class="panel">
+    <h3>1. Register a Qualification</h3>
+    <input id="regName" placeholder="Holder name">
+    <input id="regTitle" placeholder="Qualification title">
+    <input id="regInstitution" placeholder="Institution">
+    <input id="regDate" placeholder="Issue date (YYYY-MM-DD)">
+    <input id="regCert" placeholder="Certificate number (e.g. UZ-2023-000451)">
+    <button onclick="register()">Register</button>
+    <div id="regResult"></div>
+  </div>
+
+  <div class="panel">
+    <h3>2. Search Qualifications</h3>
+    <input id="searchInput" placeholder="Search by name, institution or certificate number">
+    <button onclick="search()">Search</button>
+    <div id="searchResult"></div>
+  </div>
+
+  <div class="panel">
+    <h3>3. Retrieve a Single Record</h3>
+    <input id="retrieveInput" placeholder="Exact certificate number">
+    <button onclick="retrieve()">Retrieve</button>
+    <div id="retrieveResult"></div>
+  </div>
+
+  <div class="panel">
+    <h3>4. Verify Authenticity</h3>
+    <input id="certInput" placeholder="e.g. UZ-2023-000451">
+    <button onclick="verify()">Verify</button>
+    <div id="result"></div>
+  </div>
 
   <script>
+    async function register() {
+      const payload = {
+        holder_name: document.getElementById('regName').value,
+        qualification_title: document.getElementById('regTitle').value,
+        institution: document.getElementById('regInstitution').value,
+        issue_date: document.getElementById('regDate').value,
+        certificate_number: document.getElementById('regCert').value,
+      };
+      const res = await fetch('/api/qualifications', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      document.getElementById('regResult').innerText = JSON.stringify(data);
+    }
+
+    async function search() {
+      const q = document.getElementById('searchInput').value;
+      const res = await fetch('/api/qualifications?q=' + encodeURIComponent(q));
+      const data = await res.json();
+      document.getElementById('searchResult').innerText = JSON.stringify(data, null, 2);
+    }
+
+    async function retrieve() {
+      const cert = document.getElementById('retrieveInput').value;
+      const res = await fetch('/api/qualifications/' + encodeURIComponent(cert));
+      const data = await res.json();
+      document.getElementById('retrieveResult').innerText = JSON.stringify(data, null, 2);
+    }
+
     async function verify() {
       const cert = document.getElementById('certInput').value;
       const res = await fetch('/api/verify/' + encodeURIComponent(cert));

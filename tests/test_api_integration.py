@@ -61,6 +61,40 @@ def test_audit_log_records_actions(client):
     assert "VERIFY" in actions
 
 
+def test_retrieve_existing_record_returns_full_data(client):
+    client.post("/api/qualifications", json=SAMPLE)
+    resp = client.get(f"/api/qualifications/{SAMPLE['certificate_number']}")
+    data = resp.get_json()
+    assert resp.status_code == 200
+    assert data["holder_name"] == SAMPLE["holder_name"]
+    assert data["institution"] == SAMPLE["institution"]
+
+
+def test_retrieve_unknown_record_returns_404(client):
+    resp = client.get("/api/qualifications/DOES-NOT-EXIST")
+    assert resp.status_code == 404
+
+
+def test_retrieve_action_is_logged(client):
+    client.post("/api/qualifications", json=SAMPLE)
+    client.get(f"/api/qualifications/{SAMPLE['certificate_number']}")
+    resp = client.get("/api/audit-log")
+    actions = [entry["action"] for entry in resp.get_json()]
+    assert "RETRIEVE" in actions
+
+
+def test_audit_log_filter_by_certificate_number(client):
+    other = dict(SAMPLE, certificate_number="MSU-2021-999999", holder_name="Other Person")
+    client.post("/api/qualifications", json=SAMPLE)
+    client.post("/api/qualifications", json=other)
+    resp = client.get("/api/audit-log")
+    log = resp.get_json()
+    matching = [
+        entry for entry in log if entry["certificate_number"] == SAMPLE["certificate_number"]
+    ]
+    assert len(matching) >= 1
+
+
 def test_invalid_payload_returns_400(client):
     bad_payload = dict(SAMPLE)
     bad_payload["certificate_number"] = "not-valid"
