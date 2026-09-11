@@ -12,6 +12,16 @@ SAMPLE = {
 }
 
 
+def test_about_and_contact_pages_render(client):
+    about_resp = client.get("/about")
+    contact_resp = client.get("/contact")
+
+    assert about_resp.status_code == 200
+    assert b"About Us" in about_resp.data
+    assert contact_resp.status_code == 200
+    assert b"Contact Us" in contact_resp.data
+
+
 def test_register_and_verify_flow(client):
     # Register
     resp = client.post("/api/qualifications", json=SAMPLE)

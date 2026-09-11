@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Contact Us | QualiTrust</title>
+  <style>
+    :root {
+      --bg-color: #f5f7fb;
+      --panel-bg: #ffffff;
+      --text-color: #1f2937;
+      --muted-text: #4b5563;
+      --heading-color: #123456;
+      --button-bg: #123456;
+      --button-text: #ffffff;
+      --panel-border: #dfe3ea;
+      --shadow: rgba(17, 24, 39, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px 40px;
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+
+    h1, h2 { color: var(--heading-color); }
+    p, li { color: var(--muted-text); }
+
+    .site-nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 14px 0 20px;
+    }
+
+    .site-nav a {
+      color: var(--heading-color);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .panel {
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 20px;
+      background: var(--panel-bg);
+      box-shadow: 0 4px 10px var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .button-link {
+      display: inline-block;
+      background: var(--button-bg);
+      color: var(--button-text);
+      text-decoration: none;
+      border-radius: 6px;
+      padding: 10px 16px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Contact Us</h1>
+  <nav class="site-nav" aria-label="Main navigation">
+    <a href="/">Home</a>
+    <a href="/about">About Us</a>
+    <a href="/contact">Contact Us</a>
+  </nav>
+
+  <div class="panel">
+    <h2>Get in Touch</h2>
+    <p>Email: support@qualitrust.example</p>
+    <p>Phone: +263 78 123 4567</p>
+    <p>Address: 10 Education Avenue, Harare, Zimbabwe</p>
+  </div>
+
+  <div class="panel">
+    <h2>We’d Love to Hear From You</h2>
+    <p>Whether you are a student, institution, employer, or partner, we are ready to support your verification needs.</p>
+    <a class="button-link" href="/about">Learn More About Us</a>
+  </div>
+</body>
+</html>
