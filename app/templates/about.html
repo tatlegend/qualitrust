@@ -10,10 +10,26 @@
       --text-color: #1f2937;
       --muted-text: #4b5563;
       --heading-color: #123456;
+      --input-bg: #ffffff;
+      --input-border: #d1d5db;
       --button-bg: #123456;
       --button-text: #ffffff;
       --panel-border: #dfe3ea;
       --shadow: rgba(17, 24, 39, 0.08);
+    }
+
+    body.dark-theme {
+      --bg-color: #111827;
+      --panel-bg: #1f2937;
+      --text-color: #f3f4f6;
+      --muted-text: #d1d5db;
+      --heading-color: #8ec5ff;
+      --input-bg: #111827;
+      --input-border: #374151;
+      --button-bg: #60a5fa;
+      --button-text: #0f172a;
+      --panel-border: #374151;
+      --shadow: rgba(15, 23, 42, 0.4);
     }
 
     * { box-sizing: border-box; }
@@ -25,22 +41,42 @@
       padding: 0 20px 40px;
       background: var(--bg-color);
       color: var(--text-color);
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
     h1, h2 { color: var(--heading-color); }
     p, li { color: var(--muted-text); }
 
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
     .site-nav {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
-      margin: 14px 0 20px;
+      margin: 12px 0 18px;
     }
 
     .site-nav a {
       color: var(--heading-color);
       text-decoration: none;
       font-weight: bold;
+    }
+
+    .theme-toggle {
+      background: var(--button-bg);
+      color: var(--button-text);
+      border: none;
+      border-radius: 999px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-weight: bold;
+      min-width: 120px;
     }
 
     .panel {
@@ -50,6 +86,17 @@
       background: var(--panel-bg);
       box-shadow: 0 4px 10px var(--shadow);
       margin-bottom: 20px;
+    }
+
+    .team-list {
+      list-style: none;
+      padding: 0;
+      margin: 14px 0 0;
+    }
+
+    .team-list li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--panel-border);
     }
 
     .button-link {
@@ -65,7 +112,10 @@
   </style>
 </head>
 <body>
-  <h1>About Us</h1>
+  <div class="topbar">
+    <h1>About Us</h1>
+    <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle light and dark theme">Dark mode</button>
+  </div>
   <nav class="site-nav" aria-label="Main navigation">
     <a href="/">Home</a>
     <a href="/about">About Us</a>
@@ -86,6 +136,40 @@
     </ul>
   </div>
 
+  <div class="panel">
+    <h2>Our Team</h2>
+    <ul class="team-list">
+      <li>1. Lynn Nyandoro</li>
+      <li>2. Tatenda Benjamin</li>
+      <li>3. Burton Mareke</li>
+      <li>4. Tatenda Nyamhunga</li>
+    </ul>
+  </div>
+
   <a class="button-link" href="/contact">Contact Us</a>
+
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+
+    function applyTheme(theme) {
+      const darkMode = theme === 'dark';
+      document.body.classList.toggle('dark-theme', darkMode);
+      themeToggle.textContent = darkMode ? 'Light mode' : 'Dark mode';
+      localStorage.setItem('theme', theme);
+    }
+
+    function initializeTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      applyTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const nextTheme = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
+      applyTheme(nextTheme);
+    });
+
+    initializeTheme();
+  </script>
 </body>
 </html>

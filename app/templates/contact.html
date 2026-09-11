@@ -16,6 +16,18 @@
       --shadow: rgba(17, 24, 39, 0.08);
     }
 
+    body.dark-theme {
+      --bg-color: #111827;
+      --panel-bg: #1f2937;
+      --text-color: #f3f4f6;
+      --muted-text: #d1d5db;
+      --heading-color: #8ec5ff;
+      --button-bg: #60a5fa;
+      --button-text: #0f172a;
+      --panel-border: #374151;
+      --shadow: rgba(15, 23, 42, 0.4);
+    }
+
     * { box-sizing: border-box; }
 
     body {
@@ -25,22 +37,42 @@
       padding: 0 20px 40px;
       background: var(--bg-color);
       color: var(--text-color);
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
     h1, h2 { color: var(--heading-color); }
     p, li { color: var(--muted-text); }
 
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
     .site-nav {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
-      margin: 14px 0 20px;
+      margin: 12px 0 18px;
     }
 
     .site-nav a {
       color: var(--heading-color);
       text-decoration: none;
       font-weight: bold;
+    }
+
+    .theme-toggle {
+      background: var(--button-bg);
+      color: var(--button-text);
+      border: none;
+      border-radius: 999px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-weight: bold;
+      min-width: 120px;
     }
 
     .panel {
@@ -65,7 +97,10 @@
   </style>
 </head>
 <body>
-  <h1>Contact Us</h1>
+  <div class="topbar">
+    <h1>Contact Us</h1>
+    <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle light and dark theme">Dark mode</button>
+  </div>
   <nav class="site-nav" aria-label="Main navigation">
     <a href="/">Home</a>
     <a href="/about">About Us</a>
@@ -84,5 +119,29 @@
     <p>Whether you are a student, institution, employer, or partner, we are ready to support your verification needs.</p>
     <a class="button-link" href="/about">Learn More About Us</a>
   </div>
+
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+
+    function applyTheme(theme) {
+      const darkMode = theme === 'dark';
+      document.body.classList.toggle('dark-theme', darkMode);
+      themeToggle.textContent = darkMode ? 'Light mode' : 'Dark mode';
+      localStorage.setItem('theme', theme);
+    }
+
+    function initializeTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      applyTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const nextTheme = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
+      applyTheme(nextTheme);
+    });
+
+    initializeTheme();
+  </script>
 </body>
 </html>
