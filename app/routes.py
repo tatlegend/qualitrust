@@ -29,6 +29,21 @@ def contact():
     return render_template("contact.html")
 
 
+@bp.route("/api/contact", methods=["POST"])
+def submit_contact_form():
+    payload = request.form.to_dict()
+    name = payload.get("name", "").strip()
+    email = payload.get("email", "").strip()
+    subject = payload.get("subject", "").strip()
+    message = payload.get("message", "").strip()
+
+    if not name or not email or not subject or not message:
+        return jsonify({"error": "Please complete all fields."}), 400
+
+    log_action("CONTACT", "general", request.remote_addr or "system", f"{name}<{email}>: {subject}")
+    return jsonify({"message": "Message sent successfully."}), 200
+
+
 @bp.route("/api/qualifications", methods=["POST"])
 def register_qualification():
     payload = request.get_json(force=True)

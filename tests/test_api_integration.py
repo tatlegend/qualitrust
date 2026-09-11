@@ -22,6 +22,19 @@ def test_about_and_contact_pages_render(client):
     assert b"Contact Us" in contact_resp.data
 
 
+def test_contact_form_submission_succeeds(client):
+    payload = {
+        "name": "Test User",
+        "email": "test@example.com",
+        "subject": "Website inquiry",
+        "message": "Hello, I would like to learn more about the service.",
+    }
+
+    resp = client.post("/api/contact", data=payload)
+    assert resp.status_code == 200
+    assert resp.get_json()["message"] == "Message sent successfully."
+
+
 def test_register_and_verify_flow(client):
     # Register
     resp = client.post("/api/qualifications", json=SAMPLE)

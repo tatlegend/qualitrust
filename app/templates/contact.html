@@ -84,15 +84,47 @@
       margin-bottom: 20px;
     }
 
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .contact-form label {
+      font-weight: bold;
+      color: var(--text-color);
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      background: var(--panel-bg);
+      color: var(--text-color);
+      font: inherit;
+    }
+
+    .contact-form textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
+
+    .contact-form button,
     .button-link {
       display: inline-block;
       background: var(--button-bg);
       color: var(--button-text);
-      text-decoration: none;
+      border: none;
       border-radius: 6px;
       padding: 10px 16px;
       font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
       margin-top: 10px;
+      width: auto;
     }
   </style>
 </head>
@@ -112,6 +144,30 @@
     <p>Email: support@qualitrust.example</p>
     <p>Phone: +263 78 123 4567</p>
     <p>Address: 10 Education Avenue, Harare, Zimbabwe</p>
+  </div>
+
+  <div class="panel">
+    <h2>Send Us a Message</h2>
+    <form id="contactForm" class="contact-form" method="post">
+      <div>
+        <label for="name">Full Name</label>
+        <input id="name" name="name" type="text" placeholder="Enter your full name" required>
+      </div>
+      <div>
+        <label for="email">Email Address</label>
+        <input id="email" name="email" type="email" placeholder="Enter your email" required>
+      </div>
+      <div>
+        <label for="subject">Subject</label>
+        <input id="subject" name="subject" type="text" placeholder="What is this about?" required>
+      </div>
+      <div>
+        <label for="message">Message</label>
+        <textarea id="message" name="message" placeholder="Write your message here..." required></textarea>
+      </div>
+      <button type="submit">Send Message</button>
+      <p id="contactStatus" aria-live="polite"></p>
+    </form>
   </div>
 
   <div class="panel">
@@ -139,6 +195,27 @@
     themeToggle.addEventListener('click', () => {
       const nextTheme = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
       applyTheme(nextTheme);
+    });
+
+    const contactForm = document.getElementById('contactForm');
+    const contactStatus = document.getElementById('contactStatus');
+
+    contactForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = new FormData(contactForm);
+
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      contactStatus.textContent = data.message || data.error || 'Something went wrong.';
+      contactStatus.style.color = response.ok ? 'green' : 'red';
+
+      if (response.ok) {
+        contactForm.reset();
+      }
     });
 
     initializeTheme();
